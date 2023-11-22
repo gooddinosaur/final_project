@@ -19,7 +19,18 @@ class Read:
                 self.info.append(dict(r))
 
 # add in code for a Database class
+class DB:
+    def __init__(self):
+        self.database = []
 
+    def insert(self, table):
+        self.database.append(table)
+
+    def search(self, table_name):
+        for table in self.database:
+            if table.table_name == table_name:
+                return table
+        return None
 # add in code for a Table class
 
 # modify the code in the Table class so that it supports the insert operation where an entry can be added to a list of dictionary
