@@ -1,9 +1,32 @@
 # import database module
+from database import Read, DB, Table
 
+my_DB = DB()
 # define a funcion called initializing
 
 def initializing():
-    pass
+    read_person = Read('persons.csv')
+    read_login = Read('login.csv')
+    Read.insert(read_person)
+    Read.insert(read_login)
+    persons_table = Table('persons', read_person.info)
+    my_DB.insert(persons_table)
+    login_table = Table('login', [])
+    for i in range(len(persons_table.table)):
+        if persons_table.table[i]['type'] == 'admin':
+            role = "Admin"
+        elif persons_table.table[i]['type'] == 'student':
+            role = "Member"
+        elif persons_table.table[i]['type'] == 'faculty':
+            role = "Faculty"
+        login_table.insert({'person_id': persons_table.table[i]['ID'],
+                            'username': persons_table.table[i]['fist'] + "." +
+                                        persons_table.table[i]['last'][0],
+                            'password': read_login.info[i]['password'],
+                            'role': role})
+        my_DB.insert(login_table)
+    print(persons_table)
+    print(login_table)
 
 # here are things to do in this function:
 
