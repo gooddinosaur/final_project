@@ -70,7 +70,10 @@ def exit():
 
 initializing()
 val = login()
-
+print(val)
+person_table = my_DB.search('persons')
+person_table.update('7447677', 'type', 'test')
+print(person_table)
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 
 # if val[1] = 'admin':
