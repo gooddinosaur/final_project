@@ -1,16 +1,22 @@
 # try wrapping the code below that reads a persons.csv file in a class and make it more general such that it can read in any csv file
 
-import csv, os
+import csv
+import os
+import copy
 
-__location__ = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-persons = []
-with open(os.path.join(__location__, 'persons.csv')) as f:
-    rows = csv.DictReader(f)
-    for r in rows:
-        persons.append(dict(r))
-print(persons)
+class Read:
+    def __init__(self, filename):
+        self.info = []
+        self.name = filename
+        self.__location__ = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    def insert(self):
+        with open(os.path.join(self.__location__, self.name)) as f:
+            rows = csv.DictReader(f)
+            for r in rows:
+                self.info.append(dict(r))
 
 # add in code for a Database class
 
