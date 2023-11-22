@@ -42,7 +42,13 @@ def initializing():
 # define a funcion called login
 
 def login():
-    pass
+    username = input("Enter username : ")
+    password = input("Enter password : ")
+    login_info = my_DB.search('login')
+    for i in login_info.table:
+        if username == i['username'] and password == i['password']:
+            return [i['person_id'], i['role']]
+    return None
 
 # here are things to do in this function:
    # add code that performs a login task
