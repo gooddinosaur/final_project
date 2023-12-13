@@ -1,5 +1,6 @@
 # import database module
 from database import Read, DB, Table
+from role import admin
 import csv
 
 my_DB = DB()
@@ -38,7 +39,7 @@ def initializing():
     my_DB.insert(Member_pending_request_table)
     print(persons_table)
     print(login_table)
-    print(my_DB.search('persons'))
+
 
 
 # here are things to do in this function:
@@ -60,16 +61,10 @@ def login():
     login_info = my_DB.search('login')
     for i in login_info.table:
         if username == i['username'] and password == i['password']:
+            print(f"{username} logged in as {i['role']}")
             return [i['person_id'], i['role']]
     return None
 
-
-# here are things to do in this function:
-# add code that performs a login task
-# ask a user for a username and password
-# returns [ID, role] if valid, otherwise returning None
-
-# define a function called exit
 def exit():
     pass
 
@@ -79,28 +74,24 @@ def exit():
 # By now, you know how to read in a csv file and transform it into a list of dictionaries. For this project, you also need to know how to do the reverse, i.e., writing out to a csv file given a list of dictionaries. See the link below for a tutorial on how to do this:
 
 # https://www.pythonforbeginners.com/basics/list-of-dictionaries-to-csv-in-python
+def check_role(val): #val 0 is id, val 1 is roles
+    if val[1] == 'Admin' or val[1] == 'admin':
+        person = admin(val[0], my_DB)
+        choice = admin.ask_need(person)
+        if choice == 1:
+            admin.see_table(person)
+        elif choice == 2:
+            admin.manage_database(person)
+        elif choice == 3:
+            admin.manage_table(person)
 
 
-# make calls to the initializing and login functions defined above
 
-initializing()
-val = login()
-print(val)
-person_table = my_DB.search('persons')
-person_table.update('7447677', 'type', 'test')
-print(person_table)
-
-
-# based on the return value for login, activate the code that performs activities according to the role defined for that person_id
-
-def check_role(val):
-    if val[1] == 'admin':
-        pass
     # see and do admin related activities
     elif val[1] == 'student':
         pass
     # see and do student related activities
-    elif val[1] == 'member':
+    elif val[1] == 'Member':
         pass
     # see and do member related activities
     elif val[1] == 'lead':
@@ -113,7 +104,19 @@ def check_role(val):
         pass
 
 
-# see and do advisor related activities
+# make calls to the initializing and login functions defined above
 
+initializing()
+val = login()
+print(val)
+check_role(val)
+
+
+
+
+
+
+# based on the return value for login, activate the code that performs activities according to the role defined for that person_id
+# see and do advisor related activities
 # once everyhthing is done, make a call to the exit function
 exit()

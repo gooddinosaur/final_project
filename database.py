@@ -18,6 +18,7 @@ class Read:
             for r in rows:
                 self.info.append(dict(r))
 
+
 # add in code for a Database class
 class DB:
     def __init__(self):
@@ -26,11 +27,16 @@ class DB:
     def insert(self, table):
         self.database.append(table)
 
+    def remove(self, table):
+        self.database.remove(table)
+
     def search(self, table_name):
         for table in self.database:
             if table.table_name == table_name:
                 return table
         return None
+
+
 # add in code for a Table class
 class Table:
     def __init__(self, table_name, table):
@@ -49,8 +55,8 @@ class Table:
                     joined_table.table.append(dict1)
         return joined_table
 
-    def insert(self, new_table):
-        self.table.append(new_table)
+    def insert(self, new_dic):
+        self.table.append(new_dic)
 
     def update(self, user_id, key, value):
         for i in self.table:
@@ -83,6 +89,10 @@ class Table:
 
     def __str__(self):
         return self.table_name + ':' + str(self.table)
+
+
 # modify the code in the Table class so that it supports the insert operation where an entry can be added to a list of dictionary
 
 # modify the code in the Table class so that it supports the update operation where an entry's value associated with a key can be updated
+
+
