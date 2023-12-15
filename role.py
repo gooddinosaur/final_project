@@ -1,4 +1,5 @@
 from database import Read, DB, Table
+import random
 class admin():
     def __init__(self, id, db):
         self.id = id
@@ -25,7 +26,7 @@ class admin():
         print("Table doesn't exist.")
         return False
 
-    def manage_database(self, table=0):
+    def manage_database(self):
         choice = input("Do you want to insert or remove? (insert/remove): ")
         if choice == "insert":
             table_name = input("What table name you want to insert?: ")
@@ -52,3 +53,54 @@ class admin():
         print(table.table)
 
 class student:
+    def __init__(self, id, db):
+        self.id = id
+        self.mpr = db.search('Member_pending_request')
+        self.pjt = db.search('Project')
+        self.log = db.search('login')
+    def ask_need(self):
+        print("1.See pending requests\n2.Create a project")
+        choice = input("What do you want to do?: ")
+        return choice
+
+    def response_request(self):
+        print(f"All pending request:")
+        for y in self.mpr.table:
+            if y['member_id'] == self.id:
+                print(y)
+        proj_id = input("Which project you want to accept: ")
+        for i in self.pjt.table:
+            if i['ProjectID'] == proj_id:
+                if i['Member1'] == "":
+                    i['Member1'] = self.id
+                elif i['Member2'] == "":
+                    i['Member2'] = self.id
+        response_date = input("Enter response date: ")
+        for x in self.mpr.table:
+            if x['ProjectID'] == proj_id:
+                if x['member_id'] == self.id:
+                    x['Response'] = "Accept"
+                    x['Response_date'] = response_date
+            elif x['ProjectID'] != proj_id:
+                if x['member_id'] == self.id:
+                    x['Response'] = "Deny"
+                    x['Response_date'] = response_date
+
+    def create_project(self):
+        date = input("Enter date: ")
+        for x in self.mpr.table:
+            if x['member_id'] == self.id:
+                x['Response'] = "Deny"
+                x['Response_date'] = date
+        project_id = ""
+        for k in range(7):
+            project_id += str(random.randint(0, 9))
+        title = input("Enter title of your project: ")
+        self.pjt.insert({"ProjectID": project_id, "Title": title,
+                         "Lead": self.id, "Member1": "", "Member2": "",
+                         "Advisor": "", "Status": "No member, No advisor"})
+        for i in self.log:
+            if i['ID'] == self.id:
+                i['Role'] = "Lead"
+
+
