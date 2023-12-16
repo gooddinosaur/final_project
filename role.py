@@ -1,6 +1,8 @@
 from database import Read, DB, Table
 import random
-class admin():
+
+
+class admin:
     def __init__(self, id, db):
         self.id = id
         self.db = db
@@ -41,50 +43,69 @@ class admin():
             print(f"{self.id} has removed {table_name_to_remove} table.")
 
     def manage_table(self):
-        table_name = input("Which table you want to update? (table name): ")
+        choice = input(
+            "1.Add new info to table\n2.Update info in existing table\n"
+            "3.Remove info in existing table")
+        table_name = input(
+            "Which table you want to interact with? (table name): ")
         table = self.db.search(table_name)
-        print("Before update")
-        print(table.table)
-        id = input("Which ID you want to update?: ")
-        key = input("Which key you want to update?: ")
-        value = input("What value you want to update?: ")
-        Table.update(table, id, key, value)
-        print(f"{self.id} has updated {table_name} table.")
-        print(table.table)
+        if choice == "1":
+            new_info = input("Enter your new info:")
+            table.insert(new_info)
+        elif choice == "2":
+            print("Before update")
+            print(table.table)
+            id = input("Which ID you want to update?: ")
+            key = input("Which key you want to update?: ")
+            value = input("What value you want to update?: ")
+            table.update(table, id, key, value)
+            print(f"{self.id} has updated {table_name} table.")
+            print(table.table)
+        elif choice == "3":
+            id = input("Which ID you want to remove?: ")
+            table.remove(id)
 
+
+# my_table1_filtered = my_table1.filter(lambda x: x['country'] == 'Italy')
 class student:
     def __init__(self, id, db):
         self.id = id
-        self.mpr = db.search('Member_pending_request')
+        self.mpr = db.search('Member_pending_request').filter(lambda x: x['member_id'] == id)
         self.pjt = db.search('Project')
         self.log = db.search('login')
+
     def ask_need(self):
-        print("1.See pending requests\n2.Create a project")
-        choice = input("What do you want to do?: ")
+        print("1.See pending to be member requests\n2.Create a project")
+        choice = int(input("What do you want to do?: "))
         return choice
 
     def response_request(self):
-        print(f"All pending request:")
-        for y in self.mpr.table:
-            if y['member_id'] == self.id:
+        if len(self.mpr.table) == 0:
+            print("You have no pending request.")
+        elif len(self.mpr.table) >= 1:
+            print(f"All pending request:")
+            for y in self.mpr.table:
                 print(y)
-        proj_id = input("Which project you want to accept: ")
-        for i in self.pjt.table:
-            if i['ProjectID'] == proj_id:
-                if i['Member1'] == "":
-                    i['Member1'] = self.id
-                elif i['Member2'] == "":
-                    i['Member2'] = self.id
-        response_date = input("Enter response date: ")
-        for x in self.mpr.table:
-            if x['ProjectID'] == proj_id:
-                if x['member_id'] == self.id:
-                    x['Response'] = "Accept"
-                    x['Response_date'] = response_date
-            elif x['ProjectID'] != proj_id:
-                if x['member_id'] == self.id:
-                    x['Response'] = "Deny"
-                    x['Response_date'] = response_date
+            proj_id = input("Which project you want to accept (if none type none): ")
+            for i in self.pjt.table:
+                if i['ProjectID'] == proj_id:
+                    if i['Member1'] == "-":
+                     i['Member1'] = self.id
+                    elif i['Member2'] == "-":
+                        i['Member2'] = self.id
+            response_date = input("Enter response date: ")
+            for x in self.mpr.table:
+                if x['ProjectID'] == proj_id:
+                    if x['member_id'] == self.id:
+                        x['Response'] = "Accept"
+                        x['Response_date'] = response_date
+                elif x['ProjectID'] != proj_id:
+                    if x['member_id'] == self.id:
+                        x['Response'] = "Deny"
+                        x['Response_date'] = response_date
+            for s in self.log:
+                if s['ID'] == self.id:
+                    s['Role'] = "member"
 
     def create_project(self):
         date = input("Enter date: ")
@@ -97,10 +118,98 @@ class student:
             project_id += str(random.randint(0, 9))
         title = input("Enter title of your project: ")
         self.pjt.insert({"ProjectID": project_id, "Title": title,
-                         "Lead": self.id, "Member1": "", "Member2": "",
-                         "Advisor": "", "Status": "No member, No advisor"})
-        for i in self.log:
-            if i['ID'] == self.id:
-                i['Role'] = "Lead"
+                         "Lead": self.id, "Member1": "-", "Member2": "-",
+                         "Advisor": "-", "Status": "Just Create No member, No advisor"})
 
 
+class member:
+    def __init__(self, id, db):
+        self.id = id
+        self.pjt = db.search('Project').filter(lambda x: self.id in x.values())
+        self.proj_id = self.pjt.table[0].get('ProjectID')
+        self.mpr = db.search('Member_pending_request').filter(lambda x: x['ProjectID'] == self.proj_id)
+
+    def ask_need(self):
+        print("1.See your project status.\n2.See and modify project information\n"
+            "3.See who has responded to the requests sent out")
+        choice = int(input("What do you want to do?: "))
+        return choice
+
+    def see_modified(self):
+        print("Your project information:")
+        print(self.pjt.table)
+        key = input("Which key you want to modified?: ")
+        value = input("What value you want to modified?: ")
+        self.pjt.update(self.proj_id, key, value)
+        k = [i for i in self.pjt if self.pjy[i] == self.id]
+        print(f"{self.id}{k[0]} has updated project modified")
+
+    def see_proj_status(self):
+        print("Your project status:")
+        print(self.pjt.table[0]['Status'])
+
+    def see_response(self):
+        for i in self.mpr:
+            print(i)
+
+
+class lead:
+    def __init__(self, id, db):
+        self.id = id
+        self.pjt = db.search('Project').filter(lambda x: self.id in x['Lead'])  #อาจจะผิด
+        self.proj_id = self.pjt.table[0].get('ProjectID')
+        self.mpr = db.search('Member_pending_request')
+        self.apr = db.search('Advisor_pending_request')
+
+    def ask_need(self):
+        print("1.See your project status\n"
+              "2.See and modify your project information\n"
+              "3.See who has responded to the requests sent out\n"
+              "4.Send out requests to find members\n"
+              "5.Send out requests to find a potential advisor\n"
+              "6.Submit your project")
+        choice = int(input("What do you want to do?: "))
+        return choice
+
+    def see_proj_status(self):
+        print("Your project status:")
+        print(self.pjt.table[0]['Status'])
+
+    def see_modified(self):
+        print("Your project information:")
+        print(self.pjt.table)
+        choice = input("Do you want to modified")
+        key = input("Which key you want to modified?: ")
+        value = input("What value you want to modified?: ")
+        self.pjt.update(self.proj_id, key, value)
+        print(f"{self.id}(Lead) has updated project modified")
+
+    def see_response(self):
+        for i in self.mpr.filter(lambda x: x['ProjectID'] == self.proj_id):
+            print(i)
+
+    def find_member(self):
+        member_id = input("Who will you request him to be member"
+                          "(type his ID): ")
+        message = input("A message to him: ")
+        self.mpr.insert({'ProjectID': self.proj_id, 'to_be_member': message,
+                         'Response': 'pending', "Response_date": "-",
+                         "member_id": member_id})
+
+    def find_advisor(self):
+        advisor_id = input("Who will you request him to be member"
+                          "(type his ID): ")
+        message = input("A message to him: ")
+        self.apr.insert({'ProjectID': self.proj_id, 'to_be_advisor': message,
+                         'Response': 'pending', "Response_date": "-",
+                         "advisor_id": advisor_id})
+
+    def submit_project(self):
+        pass
+
+class faculty:
+    pass
+
+
+class advisor:
+    pass
