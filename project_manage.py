@@ -1,6 +1,6 @@
 # import database module
 from database import Read, DB, Table
-from role import admin, student, member, lead
+from role import admin, student, member, lead, faculty, advisor
 import csv
 
 my_DB = DB()
@@ -14,14 +14,7 @@ def initializing():
     Read.insert(read_person)
     Read.insert(read_login)
     persons_table = Table('persons', read_person.info)
-    login_table = Table('login', [])
-    for i in range(len(persons_table.table)):
-        role = persons_table.table[i]['type']
-        login_table.insert({'person_id': persons_table.table[i]['ID'],
-                            'username': persons_table.table[i]['fist'] + "." +
-                                        persons_table.table[i]['last'][0],
-                            'password': read_login.info[i]['password'],
-                            'role': role})
+    login_table = Table('login', read_login.info)
     project_table = Table('Project', [])
     # for x in range(len(num_project):
     # project_table.insert({})
@@ -50,13 +43,14 @@ def initializing():
 # define a funcion called login
 
 def login():
+    print("If you want to exit program just press enter")
     username = input("Enter username : ")
     password = input("Enter password : ")
     login_info = my_DB.search('login')
     for i in login_info.table:
         if username == i['username'] and password == i['password']:
-            print(f"{username} logged in as {i['role']}")
-            return [i['person_id'], i['role']]
+            print(f"***  {username} logged in as {i['role']}  ***")
+            return [i['ID'], i['role']]
     return None
 
 
@@ -82,7 +76,9 @@ def exit():
 
 # https://www.pythonforbeginners.com/basics/list-of-dictionaries-to-csv-in-python
 def check_role(val):  # val 0 is id, val 1 is roles
-    if val[1] == 'admin':
+    if val is None:
+        print("No user exist")
+    elif val[1] == 'admin':
         person = admin(val[0], my_DB)
         choice = admin.ask_need(person)
         if choice == 1:
@@ -91,6 +87,8 @@ def check_role(val):  # val 0 is id, val 1 is roles
             admin.manage_database(person)
         elif choice == 3:
             admin.manage_table(person)
+        elif choice == 4:
+            return -99
     # see and do admin related activities
     elif val[1] == 'student':
         person = student(val[0], my_DB)
@@ -127,17 +125,32 @@ def check_role(val):  # val 0 is id, val 1 is roles
             pass
     # see and do lead related activities
     elif val[1] == 'faculty':
-        pass
+        person = faculty(val[0], my_DB)
+        choice = faculty.ask_need(person)
+        if choice == 1:
+            faculty.see_req(person)
+        elif choice == 2:
+            faculty.see_req(person)
+        elif choice == 3: #Evaluate
+            pass
     # see and do faculty related activities
     elif val[1] == 'advisor':
-        pass
+        person = advisor(val[0], my_DB)
+        choice = advisor.ask_need(person)
+        if choice == 1:
+            advisor.see_proj(person)
+        elif choice == 2: #Evaluate
+            pass
 
 
 # make calls to the initializing and login functions defined above
 
 initializing()
-val = login()
-check_role(val)
+while True: # ต้องทำให้หยุดโปรแกรมได้
+    val = login()
+    i = check_role(val)
+    while i != -99:
+        i = check_role(val)
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 # see and do advisor related activities
