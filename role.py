@@ -10,9 +10,10 @@ class admin:
     def ask_need(self):
         while True:
             print("1.See table in database (specific/all)\n2.Manage the "
-                  "database (insert/remove)\n3.Manage table in database")
+                  "database (insert/remove)\n3.Manage table in database\n"
+                  "4.Log out")
             choice = int(input("What do you want to do?: "))
-            if choice in [1, 2, 3]:
+            if choice in [1, 2, 3, 4]:
                 return choice
             print("Invalid choice, Enter again")
             print()
@@ -47,9 +48,10 @@ class admin:
             print(f"{self.id} has removed {table_name_to_remove} table.")
 
     def manage_table(self):
-        choice = input(
+        print(
             "1.Add new info to table\n2.Update info in existing table\n"
             "3.Remove info in existing table")
+        choice = input("What do you want to do?: ")
         table_name = input("Which table you want to interact with? "
                            "(table name): ")
         table = self.db.search(table_name)
@@ -62,7 +64,7 @@ class admin:
             id = input("Which ID you want to update?: ")
             key = input("Which key you want to update?: ")
             value = input("What value you want to update?: ")
-            table.update(table, id, key, value)
+            table.update(id, key, value)
             print(f"{self.id} has updated {table_name} table.")
             print(table.table)
         elif choice == "3":
