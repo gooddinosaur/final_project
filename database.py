@@ -64,6 +64,12 @@ class Table:
             if i[user_id_key] == user_id:
                 i[key] = value
 
+    def remove(self, user_id):
+        for i in self.table:
+            user_id_key = list(i.keys())[0]
+            if i[user_id_key] == user_id:
+                self.table.remove(i)
+
     def filter(self, condition):
         filtered_table = Table(self.table_name + '_filtered', [])
         for item1 in self.table:
@@ -87,6 +93,19 @@ class Table:
             temps.append(dict_temp)
         return temps
 
+    def find_from_id(self, id):
+        for i in self.table:
+            user_id_key = list(i.keys())[0]
+            if i[user_id_key] == id:
+                return True
+        return False
+
+    def search(self, id):
+        for i in self.table:
+            user_id_key = list(i.keys())[0]
+            if i[user_id_key] == id:
+                return i
+        return None
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 

@@ -11,15 +11,19 @@ my_DB = DB()
 def initializing():
     read_person = Read('persons.csv')
     read_login = Read('login.csv')
+    read_project = Read('Project.csv')
+    read_ad_pen_req = Read('Advisor_pending_request.csv')
+    read_mem_pen_req = Read('Member_pending_request.csv')
     Read.insert(read_person)
     Read.insert(read_login)
+    Read.insert(read_project)
+    Read.insert(read_ad_pen_req)
+    Read.insert(read_mem_pen_req)
     persons_table = Table('persons', read_person.info)
     login_table = Table('login', read_login.info)
-    project_table = Table('Project', [])
-    # for x in range(len(num_project):
-    # project_table.insert({})
-    Advisor_pending_request_table = Table('Advisor_pending_request', [])
-    Member_pending_request_table = Table('Member_pending_request', [])
+    project_table = Table('Project', read_project.info)
+    Advisor_pending_request_table = Table('Advisor_pending_request', read_ad_pen_req.info)
+    Member_pending_request_table = Table('Member_pending_request', read_mem_pen_req.info)
     my_DB.insert(persons_table)
     my_DB.insert(login_table)
     my_DB.insert(project_table)
@@ -56,7 +60,7 @@ def login():
 
 def exit():
     for table in my_DB.database:
-        file = open(table.table_name, 'w')
+        file = open(table.table_name + ".csv", 'w')
         writer = csv.writer(file)
         keys = []
         if len(table.table) >= 1:
@@ -83,11 +87,13 @@ def check_role(val):  # val 0 is id, val 1 is roles
         choice = admin.ask_need(person)
         if choice == 1:
             admin.see_table(person)
-        elif choice == 2:
-            admin.manage_database(person)
-        elif choice == 3:
-            admin.manage_table(person)
+        elif choice == 2: #Add entry
+            admin.add_entry(person)
+        elif choice == 3: #remove entry
+            admin.remove_entry(person)
         elif choice == 4:
+            admin.update_table(person)
+        elif choice == 5:
             return -99
     # see and do admin related activities
     elif val[1] == 'student':
@@ -97,6 +103,8 @@ def check_role(val):  # val 0 is id, val 1 is roles
             student.response_request(person)
         elif choice == 2:
             student.create_project(person)
+        elif choice == 3:
+            return -99
     # see and do student related activities
     elif val[1] == 'member':
         person = member(val[0], my_DB)
@@ -107,6 +115,8 @@ def check_role(val):  # val 0 is id, val 1 is roles
             member.see_modified(person)
         elif choice == 3:
             member.see_response(person)
+        elif choice == 4:
+            return -99
     # see and do member related activities
     elif val[1] == 'lead':
         person = lead(val[0], my_DB)
@@ -123,6 +133,8 @@ def check_role(val):  # val 0 is id, val 1 is roles
             lead.find_advisor(person)
         elif choice == 6: #Submit project
             pass
+        elif choice == 7:
+            return -99
     # see and do lead related activities
     elif val[1] == 'faculty':
         person = faculty(val[0], my_DB)
@@ -133,6 +145,8 @@ def check_role(val):  # val 0 is id, val 1 is roles
             faculty.see_req(person)
         elif choice == 3: #Evaluate
             pass
+        elif choice == 4:
+            return -99
     # see and do faculty related activities
     elif val[1] == 'advisor':
         person = advisor(val[0], my_DB)
@@ -141,16 +155,20 @@ def check_role(val):  # val 0 is id, val 1 is roles
             advisor.see_proj(person)
         elif choice == 2: #Evaluate
             pass
+        elif choice == 3:
+            return -99
 
 
 # make calls to the initializing and login functions defined above
 
 initializing()
-while True: # ต้องทำให้หยุดโปรแกรมได้
-    val = login()
+val = login()
+while val is not None: # ต้องทำให้หยุดโปรแกรมได้
     i = check_role(val)
     while i != -99:
         i = check_role(val)
+
+    val = login()
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 # see and do advisor related activities
