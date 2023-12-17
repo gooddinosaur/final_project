@@ -47,7 +47,7 @@ def initializing():
 # define a funcion called login
 
 def login():
-    print("If you want to exit program just press enter")
+    print("If you want to exit program just press enter 2 times.")
     username = input("Enter username : ")
     password = input("Enter password : ")
     login_info = my_DB.search('login')
@@ -87,9 +87,9 @@ def check_role(val):  # val 0 is id, val 1 is roles
         choice = admin.ask_need(person)
         if choice == 1:
             admin.see_table(person)
-        elif choice == 2: #Add entry
+        elif choice == 2:
             admin.add_entry(person)
-        elif choice == 3: #remove entry
+        elif choice == 3:
             admin.remove_entry(person)
         elif choice == 4:
             admin.update_table(person)
@@ -131,9 +131,11 @@ def check_role(val):  # val 0 is id, val 1 is roles
             lead.find_member(person)
         elif choice == 5:
             lead.find_advisor(person)
-        elif choice == 6: #Submit project
-            pass
+        elif choice == 6:
+            lead.update_proj_status(person)
         elif choice == 7:
+            lead.submit_project(person)
+        elif choice == 8:
             return -99
     # see and do lead related activities
     elif val[1] == 'faculty':
@@ -144,7 +146,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 2:
             faculty.see_req(person)
         elif choice == 3: #Evaluate
-            pass
+            faculty.evaluate(person)
         elif choice == 4:
             return -99
     # see and do faculty related activities
@@ -154,7 +156,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         if choice == 1:
             advisor.see_proj(person)
         elif choice == 2: #Evaluate
-            pass
+            advisor.evaluate(person)
         elif choice == 3:
             return -99
 
@@ -167,7 +169,6 @@ while val is not None: # ต้องทำให้หยุดโปรแก�
     i = check_role(val)
     while i != -99:
         i = check_role(val)
-
     val = login()
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
