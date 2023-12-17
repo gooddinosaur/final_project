@@ -50,10 +50,14 @@ def login():
     print("If you want to exit program just press enter 2 times.")
     username = input("Enter username : ")
     password = input("Enter password : ")
+    print()
     login_info = my_DB.search('login')
     for i in login_info.table:
         if username == i['username'] and password == i['password']:
-            print(f"***  {username} logged in as {i['role']}  ***")
+            print(f"  ***  {username} logged in as {i['role']}  ***")
+            print("----- Welcome to project manage program -----")
+            print("        ----- Here's your menu -----")
+            print()
             return [i['ID'], i['role']]
     return None
 
@@ -94,6 +98,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 4:
             admin.update_table(person)
         elif choice == 5:
+            print()
             return -99
     # see and do admin related activities
     elif val[1] == 'student':
@@ -104,6 +109,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 2:
             student.create_project(person)
         elif choice == 3:
+            print()
             return -99
     # see and do student related activities
     elif val[1] == 'member':
@@ -116,6 +122,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 3:
             member.see_response(person)
         elif choice == 4:
+            print()
             return -99
     # see and do member related activities
     elif val[1] == 'lead':
@@ -136,6 +143,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 7:
             lead.submit_project(person)
         elif choice == 8:
+            print()
             return -99
     # see and do lead related activities
     elif val[1] == 'faculty':
@@ -144,10 +152,11 @@ def check_role(val):  # val 0 is id, val 1 is roles
         if choice == 1:
             faculty.see_req(person)
         elif choice == 2:
-            faculty.see_req(person)
-        elif choice == 3: #Evaluate
+            faculty.see_proj(person)
+        elif choice == 3:
             faculty.evaluate(person)
         elif choice == 4:
+            print()
             return -99
     # see and do faculty related activities
     elif val[1] == 'advisor':
@@ -155,9 +164,10 @@ def check_role(val):  # val 0 is id, val 1 is roles
         choice = advisor.ask_need(person)
         if choice == 1:
             advisor.see_proj(person)
-        elif choice == 2: #Evaluate
+        elif choice == 2:
             advisor.evaluate(person)
         elif choice == 3:
+            print()
             return -99
 
 
@@ -165,7 +175,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
 
 initializing()
 val = login()
-while val is not None: # ต้องทำให้หยุดโปรแกรมได้
+while val is not None:
     i = check_role(val)
     while i != -99:
         i = check_role(val)

@@ -1,7 +1,8 @@
 # Draft code for evaluation step
 ### Faculty (Both normal and advisor)
 - Evaluate projects
-  - 0 - 10 score
+  - 0 - 10 score for each faculty
+  - If score >= 30 then project is approved
 ### Note: 
 - I have already added search and update function in table class, So I'll use it in this function.
 - my_DB is defined in project_manage.py

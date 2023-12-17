@@ -2,9 +2,13 @@
 - See an invitational message from the lead student that already created his own project
   - Accept
   - Deny
-- See and modify his project details
+    - Project table needs to be updated
+    - Member pending request table needs to be updated.
+- Create a Project
+  - Project table needs to be updated
+  - If that student have pending member request from other student
+    - Member pending request table needs to be updated.
 ### Lead student
-  - Create a project
   - See project status (pending member, pending advisor, or ready to solicit an advisor)
   - See and modify project information
   - Find members
@@ -43,4 +47,5 @@
    - Can update or change all tables in database
      - Remove
      - Insert
- 
+   - Update table in database
+     - Change value 
