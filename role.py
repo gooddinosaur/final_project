@@ -76,6 +76,9 @@ class admin:
         self.lt.insert(
             {'ID': new_id, 'username': new_first_name + "." + new_last_name[0],
              'password': new_password, 'role': new_role})
+        print(f"Created id: {new_id} successful")
+        print(f"ID: {new_id} created by {self.id}")
+        print()
 
     def remove_entry(self):
         """Function for remove existed person from database."""
@@ -123,7 +126,9 @@ class admin:
         value = input("What value you want to update?: ")
         table.update(_id, key, value)
         print(f"{self.id} has updated {table_name} table.")
+        print("After update")
         print(table.table)
+        print()
 
 
 class student:
@@ -178,11 +183,11 @@ class student:
                 if x['ProjectID'] == proj_id:
                     if x['member_id'] == self.id:
                         x['Response'] = "Accept"
-                        x['Response_date'] = date.today()
+                        x['Response_date'] = date.today().strftime("%Y-%m-%d")
                 elif x['ProjectID'] != proj_id:
                     if x['member_id'] == self.id:
                         x['Response'] = "Deny"
-                        x['Response_date'] = date.today()
+                        x['Response_date'] = date.today().strftime("%Y-%m-%d")
             for s in self.log.table:
                 if s['ID'] == self.id:
                     s['role'] = "member"
@@ -713,7 +718,6 @@ class advisor:
                 self.pjt.update(proj_id, "Scorer", scorers)
                 if score >= 30 and len(scorers) == 47:
                     self.pjt.update(proj_id, "Status", "Approved")
-
             elif self.id in proj_info['Scorer']:
                 print("You have already evaluate this project.")
                 print()
