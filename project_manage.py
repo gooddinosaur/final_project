@@ -1,14 +1,13 @@
-# import database module
+"""For starting project manager program"""
+import csv
 from database import Read, DB, Table
 from role import admin, student, member, lead, faculty, advisor
-import csv
 
 my_DB = DB()
 
 
-# define a funcion called initializing
-
 def initializing():
+    """Start a program"""
     read_person = Read('persons.csv')
     read_login = Read('login.csv')
     read_project = Read('Project.csv')
@@ -22,46 +21,37 @@ def initializing():
     persons_table = Table('persons', read_person.info)
     login_table = Table('login', read_login.info)
     project_table = Table('Project', read_project.info)
-    Advisor_pending_request_table = Table('Advisor_pending_request', read_ad_pen_req.info)
-    Member_pending_request_table = Table('Member_pending_request', read_mem_pen_req.info)
+    advisor_pending_request_table = Table('Advisor_pending_request',
+                                          read_ad_pen_req.info)
+    member_pending_request_table = Table('Member_pending_request',
+                                         read_mem_pen_req.info)
     my_DB.insert(persons_table)
     my_DB.insert(login_table)
     my_DB.insert(project_table)
-    my_DB.insert(Advisor_pending_request_table)
-    my_DB.insert(Member_pending_request_table)
+    my_DB.insert(advisor_pending_request_table)
+    my_DB.insert(member_pending_request_table)
     print(login_table)
 
 
-# here are things to do in this function:
-
-# create an object to read all csv files that will serve as a persistent state for this program
-
-# create all the corresponding tables for those csv files
-
-# see the guide how many tables are needed
-
-# add all these tables to the database
-
-
-# define a funcion called login
-
 def login():
+    """Login function to get user id and role"""
     print("If you want to exit program just press enter 2 times.")
     username = input("Enter username : ")
     password = input("Enter password : ")
     print()
     login_info = my_DB.search('login')
-    for i in login_info.table:
-        if username == i['username'] and password == i['password']:
-            print(f"  ***  {username} logged in as {i['role']}  ***")
+    for info in login_info.table:
+        if username == info['username'] and password == info['password']:
+            print(f"  ***  {username} logged in as {info['role']}  ***")
             print("----- Welcome to project manage program -----")
             print("        ----- Here's your menu -----")
             print()
-            return [i['ID'], i['role']]
+            return [info['ID'], info['role']]
     return None
 
 
-def exit():
+def _exit():
+    """Exit function to write all info into csv file"""
     for table in my_DB.database:
         file = open(table.table_name + ".csv", 'w')
         writer = csv.writer(file)
@@ -70,19 +60,13 @@ def exit():
             for key in table.table[0].keys():
                 keys.append(key)
             writer.writerow(keys)
-            for dict in table.table:
-                writer.writerow(dict.values())
+            for _dict in table.table:
+                writer.writerow(_dict.values())
         file.close()
 
 
-# here are things to do in this function:
-# write out all the tables that have been modified to the corresponding csv files
-# By now, you know how to read in a csv file and transform it into a list of dictionaries.
-# For this project, you also need to know how to do the reverse, i.e.,
-# writing out to a csv file given a list of dictionaries. See the link below for a tutorial on how to do this:
-
-# https://www.pythonforbeginners.com/basics/list-of-dictionaries-to-csv-in-python
-def check_role(val):  # val 0 is id, val 1 is roles
+def check_role(val):
+    """To check role of user's role and do user's role related activity."""
     if val is None:
         print("No user exist")
     elif val[1] == 'admin':
@@ -99,7 +83,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 5:
             print()
             return -99
-    # see and do admin related activities
+
     elif val[1] == 'student':
         person = student(val[0], my_DB)
         choice = student.ask_need(person)
@@ -110,7 +94,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 3:
             print()
             return -99
-    # see and do student related activities
+
     elif val[1] == 'member':
         person = member(val[0], my_DB)
         choice = member.ask_need(person)
@@ -123,7 +107,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 4:
             print()
             return -99
-    # see and do member related activities
+
     elif val[1] == 'lead':
         person = lead(val[0], my_DB)
         choice = lead.ask_need(person)
@@ -144,7 +128,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 8:
             print()
             return -99
-    # see and do lead related activities
+
     elif val[1] == 'faculty':
         person = faculty(val[0], my_DB)
         choice = faculty.ask_need(person)
@@ -157,7 +141,7 @@ def check_role(val):  # val 0 is id, val 1 is roles
         elif choice == 4:
             print()
             return -99
-    # see and do faculty related activities
+
     elif val[1] == 'advisor':
         person = advisor(val[0], my_DB)
         choice = advisor.ask_need(person)
@@ -170,8 +154,6 @@ def check_role(val):  # val 0 is id, val 1 is roles
             return -99
 
 
-# make calls to the initializing and login functions defined above
-
 initializing()
 val = login()
 while val is not None:
@@ -180,7 +162,4 @@ while val is not None:
         i = check_role(val)
     val = login()
 
-# based on the return value for login, activate the code that performs activities according to the role defined for that person_id
-# see and do advisor related activities
-# once everyhthing is done, make a call to the exit function
-exit()
+_exit()
