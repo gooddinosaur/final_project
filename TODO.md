@@ -23,29 +23,27 @@
  - See and modify project information
    - Project table needs to be updated
  - See who has responded to the requests sent out
+
 # Faculty
 ### Normal faculty who isn't an advisor
 - See request to be a supervisor
+  - Accept
   - Deny
 - Can see all information of all project
 - Evaluate projects
-  - Pass
-  - Not pass
+  - Score 0 - 10
+  - Project will approve, If score >= 30 after all faculty evaluate.
 
 ### Advising faculty
-- See request to be a supervisor
-  - Accept (for project that want to be an advisor)
-  - Deny (for project that not want to be an advisor)
 - Can see all information of all project
 - Evaluate projects
-  - Pass
-  - Not pass
-- Approve the project
+  - Score 0 - 10
+  - Project will approve, If score >= 30 after all faculty evaluate.
 
 # Admin
  - Managing the database
-   - Can update or change all tables in database
-     - Remove
-     - Insert
+   - Can add entry and remove entry in database
+     - Add user
+     - Remove user
    - Update table in database
      - Change value 
