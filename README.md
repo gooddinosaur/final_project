@@ -72,10 +72,10 @@
     2. see_proj_status
        - Function for lead to see his project status.
     3. see_modified
-      - Function for lead to see his project.
-      - Function for lead to modified his project
-         - Want to modify
-         - Doesn't want to modify
+       - Function for lead to see his project.
+       - Function for lead to modified his project
+          - Want to modify
+          - Doesn't want to modify
     4. see_response
        - Function for lead to see his project pending request.
          - Pending member request
