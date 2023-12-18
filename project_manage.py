@@ -83,7 +83,6 @@ def check_role(val):
         elif choice == 5:
             print()
             return -99
-
     elif val[1] == 'student':
         person = student(val[0], my_DB)
         choice = student.ask_need(person)
@@ -94,7 +93,6 @@ def check_role(val):
         elif choice == 3:
             print()
             return -99
-
     elif val[1] == 'member':
         person = member(val[0], my_DB)
         choice = member.ask_need(person)
@@ -107,7 +105,6 @@ def check_role(val):
         elif choice == 4:
             print()
             return -99
-
     elif val[1] == 'lead':
         person = lead(val[0], my_DB)
         choice = lead.ask_need(person)
@@ -128,7 +125,6 @@ def check_role(val):
         elif choice == 8:
             print()
             return -99
-
     elif val[1] == 'faculty':
         person = faculty(val[0], my_DB)
         choice = faculty.ask_need(person)
@@ -141,7 +137,6 @@ def check_role(val):
         elif choice == 4:
             print()
             return -99
-
     elif val[1] == 'advisor':
         person = advisor(val[0], my_DB)
         choice = advisor.ask_need(person)
