@@ -3,6 +3,10 @@
   - database.py
   - project_manage.py
   - persons.csv
+## Comfortable way to read this file
+- [How to compile and run your project.](#how-to)
+- [Table detailing each role and its actions](#table-de)
+- [List of missing features and outstanding bugs](#list-mis)
 ----
 ## List of files in this repo
 
@@ -206,13 +210,13 @@
 ### 11.TODO.md
 - To describe what to do in this final project.
 ----
-## How to compile and run your project.
+## <a name="how-to"></a>How to compile and run your project.
 - Open project_mange.py and run
 - Enter your username and password
 - Do what you want to do
 - Log out
 ----
-## Table detailing each role and its actions
+## <a name="table-de"></a>Table detailing each role and its actions
 
 | Role    | Action                                  | Method              | Class   | Completion |
 |---------|-----------------------------------------|---------------------|---------|------------|
@@ -241,7 +245,7 @@
 | advisor | Evaluate a project                      | evaluate            | advisor | 100%       |
 
 ----
-## List of missing features and outstanding bugs
+## <a name="list-mis"></a>List of missing features and outstanding bugs
 ### Missing features
 - I think that faculty/advisor must have option to do more than this such as
   - Sent message to lead
