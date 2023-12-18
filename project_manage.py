@@ -29,7 +29,6 @@ def initializing():
     my_DB.insert(project_table)
     my_DB.insert(Advisor_pending_request_table)
     my_DB.insert(Member_pending_request_table)
-    print(persons_table)
     print(login_table)
 
 

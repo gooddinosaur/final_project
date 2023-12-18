@@ -1,4 +1,5 @@
 from database import Read, DB, Table
+from datetime import date
 import random
 
 
@@ -157,36 +158,48 @@ class student:
                     elif i['Member2'] == "-":
                         i['Member2'] = self.id
                         i['Status'] = "Have 2 members"
-            response_date = input("Enter response date: ")
             for x in self.mpr.table:
                 if x['ProjectID'] == proj_id:
                     if x['member_id'] == self.id:
                         x['Response'] = "Accept"
-                        x['Response_date'] = response_date
+                        x['Response_date'] = date.today()
                 elif x['ProjectID'] != proj_id:
                     if x['member_id'] == self.id:
                         x['Response'] = "Deny"
-                        x['Response_date'] = response_date
+                        x['Response_date'] = date.today()
             for s in self.log.table:
                 if s['ID'] == self.id:
                     s['role'] = "member"
             print("Logout and login again to access your project")
 
     def create_project(self):
-        date = input("Enter date: ")
+        lead_proj = self.pjt.select(['Lead'])
+        for i in lead_proj:
+            if i['Lead'] == self.id:
+                print(
+                    "Can't create project, You have already created project.")
+                return
         for x in self.mpr.table:
             if x['member_id'] == self.id:
                 x['Response'] = "Deny"
-                x['Response_date'] = date
+                x['Response_date'] = date.today().strftime("%Y-%m-%d")
+        proj_id_info = self.pjt.select(['ProjectID'])
+        proj_id_info_list = []
+        for x in proj_id_info:
+            proj_id_info_list.append(x['ProjectID'])
         project_id = ""
         for k in range(7):
             project_id += str(random.randint(0, 9))
+        while project_id in proj_id_info_list:
+            project_id = ""
+            for k in range(7):
+                project_id += str(random.randint(0, 9))
         title = input("Enter title of your project: ")
         self.pjt.insert({"ProjectID": project_id, "Title": title,
                          "Lead": self.id, "Member1": "-", "Member2": "-",
                          "Advisor": "-",
                          "Status": "Just Created No member, No advisor",
-                         "Score": 0})
+                         "Score": 0, "Scorer": ""})
         for s in self.log.table:
             if s['ID'] == self.id:
                 s['role'] = "lead"
@@ -202,6 +215,8 @@ class member:
         self.proj_id = self.pjt.table[0].get('ProjectID')
         self.mpr = db.search('Member_pending_request').filter(
             lambda x: x['ProjectID'] == self.proj_id)
+        self.apr = (db.search('Advisor_pending_request').filter
+                    (lambda x: x['ProjectID'] == self.proj_id))
 
 
     def ask_need(self):
@@ -218,27 +233,53 @@ class member:
 
     def see_modified(self):
         print("Your project information:")
-        print(self.pjt)
+        print(self.pjt.table)
         choice = input("Do you want to modified(yes/no): ")
+        allowed_key = ['ProjectID', 'Title', 'Lead', 'Member1', 'Member2',
+                       'Advisor']
+        not_allowed_key = ['Status', 'Score']
         if choice == "yes":
             key = input("Which key you want to modified?: ")
+            while key in not_allowed_key or key not in allowed_key:
+                if key == 'Score':
+                    print(
+                        "You aren't able to score by yourself!!, Enter again")
+                elif key == 'Status':
+                    print("You aren't able to change project status by yourself!!, Enter again")
+                elif key not in ['Score', 'Status']:
+                    print("Key is invalid, Enter again")
+                key = input("Which key you want to modified?: ")
             value = input("What value you want to modified?: ")
             self.pjt.update(self.proj_id, key, value)
             dic = self.pjt.search(self.proj_id)
             k = [i for i in dic if dic[i] == self.id]
-            print(f"{self.id} ({k[0]}) has updated project")
+            print(f"{self.id} ({k[0]}) has updated project id:{self.proj_id}")
+            print()
 
     def see_proj_status(self):
         print("Your project status:")
         print(self.pjt.table[0]['Status'])
+        print()
 
     def see_response(self):
-        if len(self.mpr.table) == 0:
-            print("You haven't sent request to anyone.")
-        elif len(self.mpr.table) >= 1:
-            print("Here's your pending request.")
-            for i in self.mpr.table:
+        filter_mpr = self.mpr
+        filter_apr = self.apr
+        if len(filter_mpr.table) == 0:
+            print("You haven't sent request to be member to any student.")
+            print()
+        elif len(filter_mpr.table) >= 1:
+            print("All member pending request:")
+            for i in filter_mpr.table:
                 print(i)
+            print()
+        if len(filter_apr.table) == 0:
+            print("You haven't sent request to be advisor to any faculty.")
+            print()
+        elif len(filter_apr.table) >= 1:
+            print("All advisor pending request:")
+            for i in filter_apr.table:
+                print(i)
+            print()
 
 
 class lead:
@@ -273,16 +314,30 @@ class lead:
         print("Your project status:")
         proj_dic = self.pjt.search(self.proj_id)
         print(proj_dic['Status'])
+        print()
 
     def see_modified(self):
         print("Your project information:")
-        print(self.opjt)
+        print(self.opjt.table)
         choice = input("Do you want to modified(yes/no): ")
+        allowed_key = ['ProjectID', 'Title', 'Lead', 'Member1', 'Member2', 'Advisor']
+        not_allowed_key = ['Status', 'Score']
         if choice == "yes":
             key = input("Which key you want to modified?: ")
+            while key in not_allowed_key or key not in allowed_key:
+                if key == 'Score':
+                    print("You aren't able to score by yourself!!, Enter again")
+                elif key == 'Status':
+                    print("You aren't able to change project status by yourself!!, Enter again")
+                elif key not in ['Score', 'Status']:
+                    print("Key is invalid, Enter again")
+                key = input("Which key you want to modified?: ")
             value = input("What value you want to modified?: ")
             self.pjt.update(self.proj_id, key, value)
-            print(f"{self.id} (Lead) has updated project modified")
+            print(f"{self.id} (Lead) has updated project id: {self.proj_id}")
+            print()
+        elif choice == "no":
+            print()
 
     def see_response(self):
         filter_mpr = self.mpr.filter(lambda x: x['ProjectID'] == self.proj_id)
@@ -312,6 +367,8 @@ class lead:
         member_id = input("Who will you request him to be member"
                           "(type his ID): ")
         message = input("A message to him: ")
+        print("Request has been sent.")
+        print()
         self.mpr.insert({'ProjectID': self.proj_id, 'to_be_member': message,
                          'Response': 'pending', "Response_date": "-",
                          "member_id": member_id})
@@ -324,14 +381,24 @@ class lead:
         advisor_id = input("Who will you request him to be member"
                            "(type his ID): ")
         message = input("A message to him: ")
+        print(f"Request has been sent to advisor id: {advisor_id}.")
+        print()
         self.apr.insert({'ProjectID': self.proj_id, 'to_be_advisor': message,
                          'Response': 'pending', "Response_date": "-",
                          "advisor_id": advisor_id})
 
     def update_proj_status(self):
         proj_dic = self.pjt.search(self.proj_id)
+        if proj_dic['Status'] == 'Approved':
+            print("Your project is already approved, No need to update.")
+            print()
+            return
         status = ""
-        if proj_dic['Member1'] != "-" and proj_dic['Member2'] == "-" and proj_dic['Advisor'] == "-":
+        if proj_dic['Member1'] == "-" and proj_dic['Member2'] == "-" and proj_dic['Advisor'] == "-":
+            print("Your project status has updated.")
+            print()
+            return
+        elif proj_dic['Member1'] != "-" and proj_dic['Member2'] == "-" and proj_dic['Advisor'] == "-":
             status += "Have 1 member, No advisor"
         elif proj_dic['Member1'] != "-" and proj_dic['Member2'] != "-" and proj_dic['Advisor'] == "-":
             status += "Have 2 members, No advisor"
@@ -356,6 +423,11 @@ class lead:
         print()
 
     def submit_project(self):
+        proj_dic = self.pjt.search(self.proj_id)
+        if proj_dic['Status'] == 'Approved':
+            print("Your project is already approved, Can't submit again.")
+            print()
+            return
         filter_mpr = self.mpr.filter(lambda x: x['ProjectID'] == self.proj_id)
         filter_apr = self.apr.filter(lambda x: x['ProjectID'] == self.proj_id)
         count_pending_m = 0
@@ -367,9 +439,17 @@ class lead:
             if j['Response'] == 'pending':
                 count_pending_a += 1
         if count_pending_m == 0 and count_pending_a == 0:
-            self.pjt.update(self.proj_id, "Status", "Ready to evaluate")
-            print("Your project has submitted.")
-            print()
+            check = input("Are you sure you want to submit?(confirm,cancel): ")
+            while check not in ['confirm', 'cancel']:
+                print("Invalid choice, Enter again")
+                check = input(
+                    "Are you sure you want to submit?(confirm,cancel): ")
+            if check == 'confirm':
+                self.pjt.update(self.proj_id, "Status", "Pending evaluate")
+                print("Your project has submitted.")
+                print()
+            elif check == 'cancel':
+                print("Canceled submission")
         else:
             print("Your project can't submit yet, because there's pending request.")
             if count_pending_m >= 1:
@@ -382,7 +462,7 @@ class faculty:
     def __init__(self, id, db):
         self.id = id
         self.apr = db.search('Advisor_pending_request').filter(
-            lambda x: x['advisor_id'] == self.id)
+            lambda x: x['advisor_id'] == self.id and x['Response'] == 'pending')
         self.pjt = db.search('Project')
         self.log = db.search('login').filter(lambda x: x['ID'] == self.id)
 
@@ -399,34 +479,47 @@ class faculty:
             print()
 
     def see_req(self):
+        all_proj_id = ['quit']
+        for x in self.apr.table:
+            all_proj_id.append(x['ProjectID'])
         if len(self.apr.table) == 0:
             print("You have no pending request.")
         elif len(self.apr.table) >= 1:
             print("Your pending request: ")
             for i in self.apr.table:
                 print(i)
-            proj_id = input("Which project you want to accept(type project id/"
-                            " if none type none)?: ")
-            if proj_id == "none":
-                return False
-            for i in self.pjt.table:
-                if i['ProjectID'] == proj_id:
-                    i['Advisor'] = self.id
-            for y in self.pjt.table:
-                if y['ProjectID'] == proj_id:
-                    y['Status'] += ", Have advisor"
-            response_date = input("Enter response date: ")
-            for x in self.apr.table:
-                if x['ProjectID'] == proj_id:
-                    if x['advisor_id'] == self.id:
-                        x['Response'] = "Accept"
-                        x['Response_date'] = response_date
-                elif x['ProjectID'] != proj_id:
-                    if x['advisor_id'] == self.id:
-                        x['Response'] = "Deny"
-                        x['Response_date'] = response_date
-            for s in self.log.table:
-                s['role'] = "advisor"
+            proj_id = input("Which project you want to accept/deny "
+                            "(accept projectID / deny projectID / quit)?: ").split()
+            while proj_id[0] != 'quit':
+                while proj_id[1] not in all_proj_id:
+                    print("Invalid project id, Enter again")
+                    proj_id = input("Which project you want to accept/deny(accept projectID / deny projectID / quit)?: ").split()
+                    if proj_id[0] == 'quit':
+                        print()
+                        return
+                if proj_id[0] == 'accept':
+                    for s in self.log.table:
+                        s['role'] = "advisor"
+                    for i in self.pjt.table:
+                        if i['ProjectID'] == proj_id[1]:
+                            i['Advisor'] = self.id
+                    for y in self.pjt.table:
+                        if y['ProjectID'] == proj_id[1]:
+                            y['Status'] += ", Have advisor"
+                    for x in self.apr.table:
+                        if x['ProjectID'] == proj_id[1]:
+                            if x['advisor_id'] == self.id:
+                                x['Response'] = "Accept"
+                                x['Response_date'] = date.today().strftime("%Y-%m-%d")
+                elif proj_id[0] == 'deny':
+                    for i in self.apr.table:
+                        if i['ProjectID'] == proj_id[1]:
+                            if i['advisor_id'] == self.id:
+                                i['Response'] = 'Deny'
+                                i['Response_date'] = date.today().strftime("%Y-%m-%d")
+                proj_id = input("Which project you want to accept/deny(accept projectID / deny projectID / quit)?: ").split()
+            print()
+
 
     def see_proj(self):
         all_proj_id = ['all', 'cancel']
@@ -443,19 +536,21 @@ class faculty:
         elif choice == "all":
             for i in self.pjt:
                 print(i)
+            print()
         elif self.pjt.find_from_id(choice):
             print(self.pjt.search(choice))
+            print()
 
     def evaluate(self):
         all_proj_id = ['cancel']
-        for i in self.pjt.filter(lambda x: x['Status'] == "Ready to evaluate").table:
+        for i in self.pjt.filter(lambda x: x['Status'] == "Pending evaluate").table:
             all_proj_id.append(i['ProjectID'])
         if len(all_proj_id) == 1:
             print("There's not any project that ready to be evaluate.")
         elif len(all_proj_id) >= 2:
             print("Project that you can evaluate: ")
             for i in self.pjt.filter(
-                    lambda x: x['Status'] == "Ready to evaluate").table:
+                    lambda x: x['Status'] == "Pending evaluate").table:
                 print(i)
             proj_id = input("Which project do you want to evaluate?(type project id/ cancel): ")
             while proj_id not in all_proj_id:
@@ -463,13 +558,25 @@ class faculty:
                 proj_id = input("Which project do you want to evaluate?: ")
             if proj_id == 'cancel':
                 return
-            print(f"Evaluation for project id: {proj_id}")
-            result = int(input("Enter score for this project(0-10): "))
-            eval_proj_score = self.pjt.search(proj_id)
-            score = int(eval_proj_score['Score']) + result
-            if score >= 30:
-                self.pjt.update(proj_id, "Status", "Approved")
-            self.pjt.update(proj_id, "Score", score)
+            proj_info = self.pjt.search(proj_id)
+            scorers = proj_info['Scorer']
+            if self.id not in scorers:
+                print(f"Evaluation for project id: {proj_id}")
+                result = int(input("Enter score for this project(0-10): "))
+                print(f"You have scored project id: {proj_id}")
+                print()
+                score = int(proj_info['Score']) + result
+                self.pjt.update(proj_id, "Score", score)
+                if scorers == "":
+                    scorers = self.id
+                elif scorers != "":
+                    scorers += f"-{self.id}"
+                self.pjt.update(proj_id, "Scorer", scorers)
+                if score >= 30 and len(scorers) == 47:
+                    self.pjt.update(proj_id, "Status", "Approved")
+            elif self.id in proj_info['Scorer']:
+                print("You have already evaluate this project.")
+                print()
 
 
 class advisor:
@@ -503,33 +610,46 @@ class advisor:
         elif choice == "all":
             for i in self.pjt:
                 print(i)
+            print()
         elif self.pjt.find_from_id(choice):
             print(self.pjt.search(choice))
+            print()
 
 
 
     def evaluate(self):
         all_proj_id = ['cancel']
-        for i in self.pjt.filter(lambda x: x['Status'] == "Ready to evaluate").table:
+        for i in self.pjt.filter(lambda x: x['Status'] == "Pending evaluate").table:
             all_proj_id.append(i['ProjectID'])
         if len(all_proj_id) == 1:
             print("There's not any project that ready to be evaluate.")
         elif len(all_proj_id) >= 2:
             print("Project that you can evaluate: ")
-            for i in self.pjt.filter(lambda x: x['Status'] == "Ready to evaluate").table:
+            for i in self.pjt.filter(lambda x: x['Status'] == "Pending evaluate").table:
                 print(i)
-            print(all_proj_id)
-            print(len(all_proj_id))
             proj_id = input("Which project do you want to evaluate?(type project id/ cancel): ")
             while proj_id not in all_proj_id :
                 print("Invalid project id, Enter again.")
                 proj_id = input("Which project do you want to evaluate?: ")
             if proj_id == 'cancel':
                 return
-            print(f"Evaluation for project id: {proj_id}")
-            result = int(input("Enter score for this project(0-10): "))
-            eval_proj_score = self.pjt.search(proj_id)
-            score = int(eval_proj_score['Score']) + result
-            if score >= 30:
-                self.pjt.update(proj_id, "Status", "Approved")
-            self.pjt.update(proj_id, "Score", score)
+            proj_info = self.pjt.search(proj_id)
+            scorers = proj_info['Scorer']
+            if self.id not in scorers:
+                print(f"Evaluation for project id: {proj_id}")
+                result = int(input("Enter score for this project(0-10): "))
+                print(f"You have scored project id: {proj_id}")
+                print()
+                score = int(proj_info['Score']) + result
+                self.pjt.update(proj_id, "Score", score)
+                if scorers == "":
+                    scorers = self.id
+                elif scorers != "":
+                    scorers += f"-{self.id}"
+                self.pjt.update(proj_id, "Scorer", scorers)
+                if score >= 30 and len(scorers) == 47:
+                    self.pjt.update(proj_id, "Status", "Approved")
+
+            elif self.id in proj_info['Scorer']:
+                print("You have already evaluate this project.")
+                print()
