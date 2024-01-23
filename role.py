@@ -191,7 +191,7 @@ class student:
             for s in self.log.table:
                 if s['ID'] == self.id:
                     s['role'] = "member"
-            print("Logout and login again to access your project")
+            print("Logout and login again to acess your project")
 
     def create_project(self):
         """Function for student to create his own project."""
